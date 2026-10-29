@@ -128,7 +128,8 @@ function showAllMountains(){
   reset();
 }
 function openSh(i){sel=i;const m=D[i];sn.textContent=m[0];$("completionDate").value=(typeof done[m[0]]==="string"?done[m[0]]:localDate());si.textContent=m[6].toLocaleString()+"m · 🚗 광주 북구 양일로 70 → 약 "+tm(m[5]);upd();
-sl.href=`tmap://route?goalname=${encodeURIComponent(m[0])}&goalx=${m[2]}&goaly=${m[1]}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO`;
+const savedStart=(()=>{try{return JSON.parse(localStorage.getItem("bac100_start")||"null")}catch(e){return null}})();
+ sl.href=`tmap://route?${savedStart&&savedStart.label?"startname="+encodeURIComponent(savedStart.label)+"&":""}${savedStart&&Number.isFinite(savedStart.lon)&&Number.isFinite(savedStart.lat)?"startx="+savedStart.lon+"&starty="+savedStart.lat+"&":""}goalname=${encodeURIComponent(m[0])}&goalx=${m[2]}&goaly=${m[1]}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO`;
 const q=encodeURIComponent(m[0]+" 등산코스 높이");document.getElementById("ns").href="https://search.naver.com/search.naver?query="+q;document.getElementById("nm").href="https://map.naver.com/p/search/"+encodeURIComponent(m[0]);sh.classList.add("o")}
 function upd(){let n=0;D.forEach((m,i)=>{const k=!!done[m[0]];n+=k;dots[i].classList.toggle("dk",k);lbs[i].classList.toggle("k",k)});c.textContent=n;if(sel!=null){const v=done[D[sel][0]];sk.textContent=v?"완등 날짜 저장":"완등 날짜 저장";$("removeCompletion").style.display=v?"block":"none";si.textContent=D[sel][6].toLocaleString()+"m · 🚗 광주 북구 양일로 70 → 약 "+tm(D[sel][5])+(typeof v==="string"?" · 완등일 "+v:"");}rl()}
 sk.onclick=()=>{if(sel==null)return;const n=D[sel][0],date=$("completionDate").value;if(!date){alert("완등 날짜를 선택해 주세요.");return;}done[n]=date;save();upd();alert(n+" 완등 날짜를 저장했습니다.")};
@@ -196,27 +197,55 @@ function renderRanks(){
   };
   make("count");make("height");
 }
+function paintStartChoice(){
+  $("startCurrent").classList.toggle("on",startChoice.type==="current");
+  $("startMuan").classList.toggle("on",startChoice.type==="muan");
+  $("startCustom").classList.toggle("on",startChoice.type==="custom");
+  $("customAddressWrap").style.display=startChoice.type==="custom"?"flex":"none";
+}
 function pickStart(type){
-  startChoice={type,label:type==="current"?"현재 위치":type==="muan"?"무안읍 센텀플로라":$("customAddress").value.trim()};
-  $("startCurrent").classList.toggle("on",type==="current");$("startMuan").classList.toggle("on",type==="muan");$("startCustom").classList.toggle("on",type==="custom");
-  $("customAddressWrap").style.display=type==="custom"?"flex":"none";
+  if(type==="current"){
+    startChoice={type:"current",label:"현재 위치"};
+    paintStartChoice();
+    startStatus.textContent="현재 위치를 확인하고 있습니다…";
+    if(!navigator.geolocation){
+      startStatus.textContent="이 브라우저는 현재 위치 기능을 지원하지 않습니다. 주소 직접 입력을 이용해 주세요.";
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(pos=>{
+      startChoice.lat=pos.coords.latitude;
+      startChoice.lon=pos.coords.longitude;
+      startStatus.textContent="선택 예정 출발지: 현재 위치 (GPS 확인 완료)";
+    },()=>{
+      startStatus.textContent="현재 위치 권한을 확인할 수 없습니다. 브라우저 위치 권한을 허용하거나 주소 직접 입력을 이용해 주세요.";
+    },{enableHighAccuracy:true,timeout:10000,maximumAge:60000});
+    return;
+  }
+  startChoice={type,label:type==="muan"?"무안읍 센텀플로라":$("customAddress").value.trim()};
+  paintStartChoice();
   startStatus.textContent="선택 예정 출발지: "+(startChoice.label||"주소를 입력해 주세요");
 }
 $("startCurrent").onclick=()=>pickStart("current");
 $("startMuan").onclick=()=>pickStart("muan");
 $("startCustom").onclick=()=>pickStart("custom");
 $("saveStart").onclick=()=>{
-  if(startChoice.type==="custom"&&!$("customAddress").value.trim()){alert("출발 주소나 장소명을 입력해 주세요.");return;}
-  if(startChoice.type==="custom")startChoice.label=$("customAddress").value.trim();
+  if(startChoice.type==="custom"){
+    const address=$("customAddress").value.trim();
+    if(!address){alert("출발 주소나 장소명을 입력해 주세요.");return;}
+    startChoice.label=address;
+  }
+  if(startChoice.type==="current"&&!Number.isFinite(startChoice.lat)){
+    alert("현재 위치를 아직 확인하지 못했습니다. 위치 권한을 허용한 뒤 다시 선택해 주세요.");
+    return;
+  }
   localStorage.setItem("bac100_start",JSON.stringify(startChoice));
-  startStatus.textContent="선택된 출발지: "+startChoice.label+" · 티맵에서 출발지를 확인해 주세요.";
-  alert("출발지를 이 기기에 저장했습니다. 현재 위치/주소의 자동 경로 계산은 지도 서비스 연결이 추가로 필요합니다.");
+  startStatus.textContent="선택된 출발지: "+startChoice.label+" · 산 상세창의 길찾기에서 출발지를 확인할 수 있습니다.";
+  alert("출발지를 저장했습니다. 길찾기는 티맵에서 출발지와 도착지를 확인해 주세요.");
 };
 function restoreStart(){
-  $("startCurrent").classList.toggle("on",startChoice.type==="current");$("startMuan").classList.toggle("on",startChoice.type==="muan");$("startCustom").classList.toggle("on",startChoice.type==="custom");
-  $("customAddressWrap").style.display=startChoice.type==="custom"?"flex":"none";
+  paintStartChoice();
   if(startChoice.type==="custom")$("customAddress").value=startChoice.label||"";
-  startStatus.textContent="선택된 출발지: "+(startChoice.label||"주소를 입력해 주세요");
+  startStatus.textContent="선택된 출발지: "+(startChoice.label||"출발지를 선택해 주세요");
 }
 restoreStart();renderMySummary();renderRanks();
 

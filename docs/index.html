@@ -92,7 +92,7 @@ function showAllMountains(){
   reset();
 }
 function openSh(i){sel=i;const m=D[i];sn.textContent=m[0];si.textContent=m[6].toLocaleString()+"m · 🚗 무안센텀플로라 출발 · 기존 추정 "+tm(m[5]);upd();
-sl.href=`tmap://route?startname=${encodeURIComponent("전라남도 무안군 무안읍 무안로 550 무안센텀플로라")}&startx=126.482009675895&starty=34.9923700108377&goalname=${encodeURIComponent(m[0]+" 공영주차장")}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO`;
+sl.href=`tmap://route?startname=${encodeURIComponent("전라남도 무안군 무안읍 무안로 550 무안센텀플로라")}&startx=126.482009675895&starty=34.9923700108377&goalname=${encodeURIComponent(m[0])}&goalx=${m[2]}&goaly=${m[1]}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO`;
 const q=encodeURIComponent(m[0]);document.getElementById("ns").href="https://search.naver.com/search.naver?query="+q;document.getElementById("nm").href="https://map.naver.com/p/search/"+encodeURIComponent(m[0]);sh.classList.add("o")}
 function upd(){let n=0;D.forEach((m,i)=>{const k=!!done[m[0]];n+=k;dots[i].classList.toggle("dk",k);lbs[i].classList.toggle("k",k)});c.textContent=n;if(sel!=null){const v=done[D[sel][0]];sk.textContent=v?"완등 해제":"완등 표시";si.textContent=D[sel][6].toLocaleString()+"m · 🚗 무안센텀플로라 출발 · 기존 추정 "+tm(D[sel][5]);}rl()}
 sk.onclick=()=>{if(sel==null)return;const n=D[sel][0];if(done[n])delete done[n];else done[n]=1;save();upd()};

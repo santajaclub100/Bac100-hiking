@@ -127,13 +127,11 @@ function showAllMountains(){
   rg.forEach(([t])=>t.style.display=""); mn.forEach(([t])=>t.style.display="");
   reset();
 }
-function getStartLabel(){try{const v=JSON.parse(localStorage.getItem("bac100_start")||"null");return v&&v.label?v.label:"광주 북구 양일로 70"}catch(e){return "광주 북구 양일로 70"}}
-function mountainInfoText(m){return m[6].toLocaleString()+"m · 출발지: "+getStartLabel()+" · 실제 이동시간은 T맵 길찾기에서 확인해 주세요"}
-function openSh(i){sel=i;const m=D[i];sn.textContent=m[0];$("completionDate").value=(typeof done[m[0]]==="string"?done[m[0]]:localDate());si.textContent=mountainInfoText(m);upd();
+function openSh(i){sel=i;const m=D[i];sn.textContent=m[0];$("completionDate").value=(typeof done[m[0]]==="string"?done[m[0]]:localDate());si.textContent=m[6].toLocaleString()+"m · 🚗 광주 북구 양일로 70 → 약 "+tm(m[5]);upd();
 const savedStart=(()=>{try{return JSON.parse(localStorage.getItem("bac100_start")||"null")}catch(e){return null}})();
  sl.href=`tmap://route?${savedStart&&savedStart.label?"startname="+encodeURIComponent(savedStart.label)+"&":""}${savedStart&&Number.isFinite(savedStart.lon)&&Number.isFinite(savedStart.lat)?"startx="+savedStart.lon+"&starty="+savedStart.lat+"&":""}goalname=${encodeURIComponent(m[0])}&goalx=${m[2]}&goaly=${m[1]}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO`;
 const q=encodeURIComponent(m[0]+" 등산코스 높이");document.getElementById("ns").href="https://search.naver.com/search.naver?query="+q;document.getElementById("nm").href="https://map.naver.com/p/search/"+encodeURIComponent(m[0]);sh.classList.add("o")}
-function upd(){let n=0;D.forEach((m,i)=>{const k=!!done[m[0]];n+=k;dots[i].classList.toggle("dk",k);lbs[i].classList.toggle("k",k)});c.textContent=n;if(sel!=null){const v=done[D[sel][0]];sk.textContent=v?"완등 날짜 저장":"완등 날짜 저장";$("removeCompletion").style.display=v?"block":"none";si.textContent=mountainInfoText(D[sel])+(typeof v==="string"?" · 완등일 "+v:"");}rl()}
+function upd(){let n=0;D.forEach((m,i)=>{const k=!!done[m[0]];n+=k;dots[i].classList.toggle("dk",k);lbs[i].classList.toggle("k",k)});c.textContent=n;if(sel!=null){const v=done[D[sel][0]];sk.textContent=v?"완등 날짜 저장":"완등 날짜 저장";$("removeCompletion").style.display=v?"block":"none";si.textContent=D[sel][6].toLocaleString()+"m · 🚗 광주 북구 양일로 70 → 약 "+tm(D[sel][5])+(typeof v==="string"?" · 완등일 "+v:"");}rl()}
 sk.onclick=()=>{if(sel==null)return;const n=D[sel][0],date=$("completionDate").value;if(!date){alert("완등 날짜를 선택해 주세요.");return;}done[n]=date;save();upd();alert(n+" 완등 날짜를 저장했습니다.")};
 $("removeCompletion").onclick=()=>{if(sel==null)return;const n=D[sel][0];if(!done[n])return;if(confirm(n+" 완등 기록을 삭제할까요?")){delete done[n];save();$("completionDate").value=localDate();upd();}};
 const L=document.getElementById("list");

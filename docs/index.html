@@ -12,6 +12,7 @@ h1{font-size:17px;margin:0}.cnt{font-size:14px;color:var(--mu)}.cnt b{color:var(
 .tabs button{flex:1;padding:8px;border:1px solid var(--ln);background:var(--sf);color:var(--tx);border-radius:10px;font-size:14px}
 .tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 #map{flex:1;position:relative;overflow:hidden;touch-action:none;min-height:0;background:linear-gradient(145deg,#c9e5ef 0%,#b6d9e8 48%,#c7e4ed 100%)}
+.map-start-banner{position:absolute;z-index:3;top:12px;left:12px;right:62px;padding:9px 12px;border:1px solid rgba(255,255,255,.8);border-radius:12px;background:rgba(255,255,255,.92);color:#24352b;font-size:12px;line-height:1.4;box-shadow:0 2px 8px rgba(0,0,0,.08);pointer-events:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 svg{width:100%;height:100%;display:block}
 .mu{fill:#e7eddf;stroke:#aebfa9;stroke-width:.8;vector-effect:non-scaling-stroke}.pb{fill:none;stroke:#b4c3ad;stroke-opacity:.9;stroke-width:1.4;vector-effect:non-scaling-stroke;pointer-events:none}.mn{fill:#7c9276;font-size:10px;text-anchor:middle;pointer-events:none}.pv{fill:#dce8d5;stroke:#9eb596;stroke-opacity:.8;stroke-width:1.2;vector-effect:non-scaling-stroke}.sea-label{fill:#4f8da5;opacity:.75;font-size:18px;font-weight:600;letter-spacing:3px;text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:#c6e2ec;stroke-width:3px;stroke-linejoin:round}.sea-detail{fill:none;stroke:#ffffff;stroke-opacity:.23;stroke-width:1;pointer-events:none}
 .pn{fill:var(--mu);font-size:22px;font-weight:700;text-anchor:middle;opacity:.3;pointer-events:none}.pn.sm{font-size:10px;font-weight:400;opacity:.6}.m{display:none;fill:var(--rd);stroke:var(--bg);stroke-width:1;stroke-linejoin:round}.dk .m{display:inline}.dk circle{display:none}.dt{font-size:12px;font-weight:400;fill:var(--mu)}
@@ -49,7 +50,7 @@ svg{width:100%;height:100%;display:block}
 <header><h1>⛰ 블랙야크 100대 명산</h1><div class="head-right"><button id="searchToggle" class="search-toggle" aria-label="산 검색" title="산 검색">⌕</button><div class="cnt"><b id="c">0</b> / <span id="tot"></span></div></div></header>
 <div id="searchBox" class="search-box"><div class="search-row"><input id="mountainSearch" type="search" placeholder="산 이름 검색 (예: 무등산)" autocomplete="off"><button id="searchClose" type="button">닫기</button></div><div id="searchResults" class="search-results"></div></div>
 <div class="tabs"><button id="t1" class="on">지도</button><button id="t2">목록</button><button id="t3">회원</button><button id="t4">순위</button></div>
-<div id="map"><div id="fallback" style="position:absolute;z-index:2;left:12px;right:12px;top:12px;background:var(--sf);color:var(--tx);border:1px solid var(--ln);border-radius:12px;padding:12px;font-size:13px;line-height:1.5">지도를 준비하고 있습니다. 이 안내가 계속 보이면 파일을 휴대폰의 <b>Chrome</b> 브라우저로 열어 주세요.</div><svg id="s"></svg><div class="zb"><button id="zi">+</button><button id="zo">−</button></div></div>
+<div id="map"><div id="mapStartLabel" class="map-start-banner">출발지: 광주 북구 양일로 70 (기본값)</div><div id="fallback" style="position:absolute;z-index:2;left:12px;right:12px;top:12px;background:var(--sf);color:var(--tx);border:1px solid var(--ln);border-radius:12px;padding:12px;font-size:13px;line-height:1.5">지도를 준비하고 있습니다. 이 안내가 계속 보이면 파일을 휴대폰의 <b>Chrome</b> 브라우저로 열어 주세요.</div><svg id="s"></svg><div class="zb"><button id="zi">+</button><button id="zo">−</button></div></div>
 <div id="list"></div>
 <div id="memberPanel">
   <div class="panel-card">
@@ -94,7 +95,7 @@ MU.forEach(m=>el("path",{d:m[1],class:"mu"}));P.forEach(d=>el("path",{d,class:"p
 const rg=RG.map(([n,x,y,z])=>{const t=el("text",{class:"pn"+(z?" sm":"")});t.textContent=n;return [t,x,y]});
 const mn=MU.map(m=>{const t=el("text",{class:"mn"});t.textContent=m[0];return [t,m[2],m[3]]});
 const dots=[],lbs=[];
-D.forEach((m,i)=>{const g=el("g",{});el("circle",{r:6,class:"d"},g);el("path",{d:"M-11,8L-4,-7L0,0L4,-5L11,8Z",class:"m"},g);dots.push(g);const t=el("text",{class:"l"});const a=el("tspan",{x:11,y:-2},t);a.textContent=m[0];const b=el("tspan",{x:11,dy:14,class:"dt"},t);b.textContent=m[6]+"m · "+m[5]+"분";t.onclick=e=>{e.stopPropagation();openSh(i)};lbs.push(t)});
+D.forEach((m,i)=>{const g=el("g",{});el("circle",{r:6,class:"d"},g);el("path",{d:"M-11,8L-4,-7L0,0L4,-5L11,8Z",class:"m"},g);dots.push(g);const t=el("text",{class:"l"});const a=el("tspan",{x:11,y:-2},t);a.textContent=m[0];const b=el("tspan",{x:11,dy:14,class:"dt"},t);b.textContent="";t.onclick=e=>{e.stopPropagation();openSh(i)};lbs.push(t)});
 function fit(){const r=s.getBoundingClientRect(),a=r.width/r.height;vb.w=vb.h*a;s.setAttribute("viewBox",`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);const k=vb.h/r.height,z=vb.h<H*.6;const T=(x,y)=>`translate(${x} ${y}) scale(${k})`;dots.forEach((g,i)=>g.setAttribute("transform",T(D[i][3],D[i][4])));lbs.forEach((t,i)=>{t.setAttribute("transform",T(D[i][3],D[i][4]));t.lastChild.style.display=z?"":"none"});rg.forEach(([t,x,y])=>{t.setAttribute("transform",T(x,y));t.style.display=vb.h>H*.5?"":"none"});mn.forEach(([t,x,y])=>t.setAttribute("transform",T(x,y)))}
 function reset(){vb={x:0,y:0,w:W,h:H};const r=s.getBoundingClientRect();vb.x=(W-r.width/r.height*H)/2;fit()}
 function zoom(f,cx,cy){const r=s.getBoundingClientRect();const a=r.width/r.height;cx=cx??vb.x+vb.w/2;cy=cy??vb.y+vb.h/2;const nh=Math.min(H*1.1,Math.max(H/12,vb.h*f));const q=nh/vb.h;vb.x=cx-(cx-vb.x)*q;vb.y=cy-(cy-vb.y)*q;vb.h=nh;fit()}
@@ -128,6 +129,7 @@ function showAllMountains(){
   reset();
 }
 function getStartLabel(){try{const v=JSON.parse(localStorage.getItem("bac100_start")||"null");return v&&v.label?v.label:"광주 북구 양일로 70"}catch(e){return "광주 북구 양일로 70"}}
+function refreshMapStartLabel(){const el=document.getElementById("mapStartLabel");if(el)el.textContent="📍 출발지: "+getStartLabel()}
 function mountainInfoText(m){return m[6].toLocaleString()+"m · 출발지: "+getStartLabel()+" · 실제 이동시간은 T맵 길찾기에서 확인해 주세요"}
 function openSh(i){sel=i;const m=D[i];sn.textContent=m[0];$("completionDate").value=(typeof done[m[0]]==="string"?done[m[0]]:localDate());si.textContent=mountainInfoText(m);upd();
 const savedStart=(()=>{try{return JSON.parse(localStorage.getItem("bac100_start")||"null")}catch(e){return null}})();
@@ -254,6 +256,7 @@ $("saveStart").addEventListener("click",(event)=>{
       return;
     }
     localStorage.setItem("bac100_start",JSON.stringify(startChoice));
+    refreshMapStartLabel();
     startStatus.textContent="출발지 적용 완료: "+startChoice.label+" · 이 기기에 저장되었습니다.";
     paintStartChoice();
     alert("출발지 적용 완료! 선택한 출발지를 이 기기에 저장했습니다.");
@@ -267,7 +270,7 @@ function restoreStart(){
   if(startChoice.type==="custom")$("customAddress").value=startChoice.label||"";
   startStatus.textContent="선택된 출발지: "+(startChoice.label||"출발지를 선택해 주세요");
 }
-restoreStart();renderMySummary();renderRanks();
+restoreStart();refreshMapStartLabel();renderMySummary();renderRanks();
 
 window.addEventListener("error",e=>{const box=document.getElementById("map");if(box&&!box.querySelector(".error-note")){const n=document.createElement("div");n.className="error-note";n.style.cssText="position:absolute;left:10px;right:10px;top:10px;background:#fff0ee;color:#9b1c12;padding:10px;border-radius:10px;font-size:12px;z-index:9";n.textContent="화면을 표시하는 중 오류가 발생했습니다. 페이지를 다시 열어 주세요.";box.appendChild(n);}});
 </script></body></html>
